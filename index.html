@@ -8,24 +8,27 @@
     body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; margin: 0; padding: 24px; background:#f6f8fa; color:#111; }
     .wrap { max-width: 980px; margin: 0 auto; }
     .notice { background: #fff; border: 1px solid #e1e4e8; padding: 16px; border-radius:8px; box-shadow: 0 1px 2px rgba(0,0,0,.03); }
-    .actions { margin-top: 12px; display:flex; gap:12px; align-items:center; }
+    .actions { margin-top: 12px; display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
     .btn { padding:10px 14px; border-radius:6px; border: none; cursor:pointer; font-weight:600; }
     .btn-visit { background:#0366d6; color:#fff; }
     .btn-cancel { background:#e6edf3; color:#04293a; }
-    pre { white-space: pre-wrap; word-break: break-word; font-size: 14px; line-height:1.5; background: #fbfdff; padding: 12px; border-radius:6px; border:1px solid #eef2f6; margin-top:12px; }
+    pre { white-space: pre-wrap; word-break: break-word; font-size: 14px; line-height:1.5; background: #fbfdff; padding: 12px; border-radius:6px; border:1px solid #eef2f6; margin-top:12px; max-height:60vh; overflow:auto; }
     .small { color:#586069; font-size:13px; margin-top:8px; }
-    a.link { color:#0366d6; text-decoration:none; font-weight:600; }
+    footer { margin-top:18px; font-size:13px; color:#586069; }
+    .notice h2 { margin:0 0 8px 0; font-size:18px; }
   </style>
-  </head>
+</head>
 <body>
   <div class="wrap">
     <h1>Legado Escolar</h1>
     <div class="notice">
-      <p>Você será redirecionado automaticamente para o site principal em <strong>3 segundos</strong>.</p>
+      <h2>Entrando</h2>
+      <p>Esta página mostra o README.md do repositório e oferece um botão para acessar o site principal manualmente.</p>
+
       <div class="actions">
         <button class="btn btn-visit" id="btnVisit">Ir para o site agora</button>
-        <button class="btn btn-cancel" id="btnStay">Permanecer e ver o README</button>
-        <div class="small" id="countdown">Redirecionando em 3s…</div>
+        <button class="btn btn-cancel" id="btnStay">Mostrar README</button>
+        <div class="small" id="countdown">Contador inativo</div>
       </div>
 
       <div id="readmeContainer">
@@ -33,59 +36,46 @@
       </div>
     </div>
 
-    <footer style="margin-top:18px; font-size:13px; color:#586069;">
-      <div>Se preferir, acesse o site direto: <a class="link" href="https://cceleste6.github.io/prototipov3/">https://cceleste6.github.io/prototipov3/</a></div>
+    <footer>
+      <div>Se preferir, acesse o site direto: <a href="https://cceleste6.github.io/prototipov3/">https://cceleste6.github.io/prototipov3/</a></div>
     </footer>
   </div>
 
   <script>
-
-    const SITE_URL = "https://cceleste6.github.io/prototipov3/src/pages/main.jsx";
+    const SITE_URL = "https://cceleste6.github.io/prototipov3/";
     const GITHUB_USER = "cceleste6";
     const GITHUB_REPO = "prototipov3";
     const BRANCH = "main";
-
-    document.getElementById('metaRedirect').setAttribute('content', `3;url=${SITE_URL}`);
-
-    let t = 3;
-    const cd = document.getElementById('countdown');
-    const timer = setInterval(() => {
-      t--;
-      if (t <= 0) {
-        clearInterval(timer);
-        cd.textContent = 'Redirecionando…';
-      } else {
-        cd.textContent = `Redirecionando em ${t}s…`;
-      }
-    }, 1000);
-
-    document.getElementById('btnVisit').addEventListener('click', () => {
+    const btnVisit = document.getElementById('btnVisit');
+    const btnStay = document.getElementById('btnStay');
+    const countdownEl = document.getElementById('countdown');
+    const readmeContainer = document.getElementById('readmeContainer');
+    btnVisit.addEventListener('click', () => {
       window.location.href = SITE_URL;
     });
 
-    document.getElementById('btnStay').addEventListener('click', () => {
-      document.getElementById('metaRedirect').setAttribute('content', `0;url=${window.location.href}`);
-      clearInterval(timer);
-      cd.textContent = 'Redirecionamento cancelado. Você está vendo o README.md abaixo.';
+    btnStay.addEventListener('click', () => {
+      countdownEl.textContent = 'Você escolheu ver o README.md abaixo.';
+      readmeContainer.scrollIntoView({ behavior: 'smooth' });
     });
 
     (async function loadReadme() {
       const rawUrl = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/${BRANCH}/README.md`;
-      const container = document.getElementById('readmeContainer');
       try {
         const res = await fetch(rawUrl);
         if (!res.ok) throw new Error('README não encontrado no branch configurado');
         const md = await res.text();
-        const pre = document.createElement('pre');
+             const pre = document.createElement('pre');
         pre.textContent = md;
-        container.innerHTML = '';
-        container.appendChild(pre);
+        readmeContainer.innerHTML = '';
+        readmeContainer.appendChild(pre);
+
         const note = document.createElement('div');
         note.className = 'small';
-        note.textContent = 'Se quiser converter o README para HTML automaticamente, copie seu conteúdo para index.md com front matter (Jekyll) ou publique a build do site na pasta docs.';
-        container.appendChild(note);
+        note.textContent = 'Dica: para renderizar Markdown como HTML, renomeie/coloque o conteúdo em index.md com front matter (Jekyll) ou publique a build do site em /docs.';
+        readmeContainer.appendChild(note);
       } catch (err) {
-        container.innerHTML = `<p class="small">Falha ao carregar README.md: ${err.message}</p>`;
+        readmeContainer.innerHTML = `<p class="small">Falha ao carregar README.md: ${err.message}</p>`;
       }
     })();
   </script>
