@@ -14,8 +14,9 @@
     .btn-cancel { background:#e6edf3; color:#04293a; }
     pre { white-space: pre-wrap; word-break: break-word; font-size: 14px; line-height:1.5; background: #fbfdff; padding: 12px; border-radius:6px; border:1px solid #eef2f6; margin-top:12px; }
     .small { color:#586069; font-size:13px; margin-top:8px; }
+    a.link { color:#0366d6; text-decoration:none; font-weight:600; }
   </style>
-  <meta http-equiv="refresh" content="3;url=SITE_URL_REPLACE" id="metaRedirect">
+  <meta http-equiv="refresh" content="3;url=https://cceleste6.github.io/prototipov3/" id="metaRedirect">
 </head>
 <body>
   <div class="wrap">
@@ -32,6 +33,10 @@
         <p class="small">Carregando README.md…</p>
       </div>
     </div>
+
+    <footer style="margin-top:18px; font-size:13px; color:#586069;">
+      <div>Se preferir, acesse o site direto: <a class="link" href="https://cceleste6.github.io/prototipov3/">https://cceleste6.github.io/prototipov3/</a></div>
+    </footer>
   </div>
 
   <script>
@@ -39,7 +44,7 @@
     const SITE_URL = "https://cceleste6.github.io/prototipov3/";
     const GITHUB_USER = "cceleste6";
     const GITHUB_REPO = "prototipov3";
-    const BRANCH = "gh-pages";
+    const BRANCH = "main";
 
     document.getElementById('metaRedirect').setAttribute('content', `3;url=${SITE_URL}`);
 
@@ -78,7 +83,7 @@
         container.appendChild(pre);
         const note = document.createElement('div');
         note.className = 'small';
-        note.textContent = 'Se quiser que o README seja convertido em HTML automaticamente, copie seu conteúdo para index.md com front matter (Jekyll) ou publique a build do site na pasta docs.';
+        note.textContent = 'Se quiser converter o README para HTML automaticamente, copie seu conteúdo para index.md com front matter (Jekyll) ou publique a build do site na pasta docs.';
         container.appendChild(note);
       } catch (err) {
         container.innerHTML = `<p class="small">Falha ao carregar README.md: ${err.message}</p>`;
