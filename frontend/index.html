@@ -26,7 +26,7 @@
 
     <div class="config" id="configNote">
       <strong>Configuração SITE_URL:</strong>
-      <div style="margin-top:6px">Edite a constante SITE_URL dentro do script presente neste arquivo para apontar para o "site principal" que você quer abrir. Exemplo: <code>https://cceleste6.github.io/prototipov3/docs/</code> ou <code>https://seusite.com/</code>.</div>
+      <div style="margin-top:6px">SITE_URL configurado para a raiz do GitHub Pages deste repositório.</div>
     </div>
 
     <div class="notice">
@@ -34,7 +34,6 @@
       <p>Esta página mostra o README.md do repositório e oferece controle para acessar o site principal manualmente.</p>
 
       <div class="actions" id="actionsRow">
-        <!-- visitAnchor será preenchido dinamicamente -->
         <a id="visitAnchor" class="btn btn-visit" href="#" target="_blank" rel="noopener noreferrer">Ir para o site agora</a>
         <button class="btn btn-cancel" id="btnStay">Mostrar README</button>
         <div class="small" id="statusText">Inicializando...</div>
@@ -46,21 +45,25 @@
     </div>
 
     <footer>
-      <div>Se preferir, acesse o site direto: <a id="directLink" href="#">(configurar SITE_URL)</a></div>
+      <div>Se preferir, acesse o site direto: <a id="directLink" href="#">https://cceleste6.github.io/prototipov3/</a></div>
     </footer>
   </div>
 
   <script>
-    const SITE_URL = "https://cceleste6.github.io/prototipov3/frontend/";
+
+    const SITE_URL = "https://cceleste6.github.io/prototipov3/";
     const GITHUB_USER = "cceleste6";
     const GITHUB_REPO = "prototipov3";
     const BRANCH = "main";
+
+
     const visitAnchor = document.getElementById('visitAnchor');
     const btnStay = document.getElementById('btnStay');
     const statusText = document.getElementById('statusText');
     const readmeContainer = document.getElementById('readmeContainer');
     const directLink = document.getElementById('directLink');
     const configNote = document.getElementById('configNote');
+
     function normalize(u) {
       try {
         const url = new URL(u, window.location.origin);
@@ -88,7 +91,7 @@
       if (current === target) {
         visitAnchor.classList.add('hidden');
         statusText.textContent = 'O destino configurado (SITE_URL) é esta mesma página. O botão de visita foi ocultado para evitar loops.';
-        configNote.innerHTML = '<strong>Configuração SITE_URL:</strong><div style="margin-top:6px">O SITE_URL está apontando para a própria página atual. Altere SITE_URL para o endereço do seu site final (por ex. adicionar <code>/docs/</code> ou apontar para outro domínio).</div>';
+        configNote.innerHTML = '<strong>Configuração SITE_URL:</strong><div style="margin-top:6px">O SITE_URL está apontando para a própria página atual. Se quiser abrir outra rota (por exemplo uma build em /docs/), altere SITE_URL para essa rota.</div>';
       } else {
         visitAnchor.classList.remove('hidden');
         statusText.textContent = 'Clique em "Ir para o site agora" para abrir o site principal em nova aba.';
