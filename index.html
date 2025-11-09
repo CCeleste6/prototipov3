@@ -10,25 +10,33 @@
     .notice { background: #fff; border: 1px solid #e1e4e8; padding: 16px; border-radius:8px; box-shadow: 0 1px 2px rgba(0,0,0,.03); }
     .actions { margin-top: 12px; display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
     .btn { padding:10px 14px; border-radius:6px; border: none; cursor:pointer; font-weight:600; }
-    .btn-visit { background:#0366d6; color:#fff; }
+    .btn-visit { background:#0366d6; color:#fff; text-decoration:none; display:inline-flex; align-items:center; gap:8px; }
     .btn-cancel { background:#e6edf3; color:#04293a; }
     pre { white-space: pre-wrap; word-break: break-word; font-size: 14px; line-height:1.5; background: #fbfdff; padding: 12px; border-radius:6px; border:1px solid #eef2f6; margin-top:12px; max-height:60vh; overflow:auto; }
     .small { color:#586069; font-size:13px; margin-top:8px; }
     footer { margin-top:18px; font-size:13px; color:#586069; }
+    .hidden { display:none; }
     .notice h2 { margin:0 0 8px 0; font-size:18px; }
+    .config { background:#fffbe6; border:1px solid #fff1b8; padding:10px; border-radius:6px; margin-bottom:12px; color:#614700; }
   </style>
 </head>
 <body>
   <div class="wrap">
     <h1>Legado Escolar</h1>
+
+    <div class="config" id="configNote">
+      <strong>Configuração SITE_URL:</strong>
+      <div style="margin-top:6px">SITE_URL configurado para a raiz do GitHub Pages deste repositório.</div>
+    </div>
+
     <div class="notice">
       <h2>Entrando</h2>
-      <p>Esta página mostra o README.md do repositório e oferece um botão para acessar o site principal manualmente.</p>
+      <p>Esta página mostra o README.md do repositório e oferece controle para acessar o site principal manualmente.</p>
 
-      <div class="actions">
-        <button class="btn btn-visit" id="btnVisit">Ir para o site agora</button>
+      <div class="actions" id="actionsRow">
+        <a id="visitAnchor" class="btn btn-visit" href="#" target="_blank" rel="noopener noreferrer">Ir para o site agora</a>
         <button class="btn btn-cancel" id="btnStay">Mostrar README</button>
-        <div class="small" id="countdown">Contador inativo</div>
+        <div class="small" id="statusText">Inicializando...</div>
       </div>
 
       <div id="readmeContainer">
@@ -37,25 +45,61 @@
     </div>
 
     <footer>
-      <div>Se preferir, acesse o site direto: <a href="https://cceleste6.github.io/prototipov3/">https://cceleste6.github.io/prototipov3/</a></div>
+      <div>Se preferir, acesse o site direto: <a id="directLink" href="#">https://cceleste6.github.io/prototipov3/</a></div>
     </footer>
   </div>
 
   <script>
+
     const SITE_URL = "https://cceleste6.github.io/prototipov3/";
     const GITHUB_USER = "cceleste6";
     const GITHUB_REPO = "prototipov3";
     const BRANCH = "main";
-    const btnVisit = document.getElementById('btnVisit');
+
+
+    const visitAnchor = document.getElementById('visitAnchor');
     const btnStay = document.getElementById('btnStay');
-    const countdownEl = document.getElementById('countdown');
+    const statusText = document.getElementById('statusText');
     const readmeContainer = document.getElementById('readmeContainer');
-    btnVisit.addEventListener('click', () => {
-      window.location.href = SITE_URL;
-    });
+    const directLink = document.getElementById('directLink');
+    const configNote = document.getElementById('configNote');
+
+    function normalize(u) {
+      try {
+        const url = new URL(u, window.location.origin);
+        return url.href.replace(/\/+$/, '');
+      } catch (e) {
+        return u.replace(/\/+$/, '');
+      }
+    }
+
+    (function setupVisitLink() {
+      if (!SITE_URL || SITE_URL.trim() === "") {
+        visitAnchor.classList.add('hidden');
+        statusText.textContent = 'SITE_URL não configurado. Edite index.html e defina SITE_URL.';
+        directLink.textContent = '(defina SITE_URL no arquivo)';
+        directLink.href = '#';
+        return;
+      }
+      visitAnchor.href = SITE_URL;
+      directLink.textContent = SITE_URL;
+      directLink.href = SITE_URL;
+
+      const current = normalize(window.location.href);
+      const target = normalize(SITE_URL);
+
+      if (current === target) {
+        visitAnchor.classList.add('hidden');
+        statusText.textContent = 'O destino configurado (SITE_URL) é esta mesma página. O botão de visita foi ocultado para evitar loops.';
+        configNote.innerHTML = '<strong>Configuração SITE_URL:</strong><div style="margin-top:6px">O SITE_URL está apontando para a própria página atual. Se quiser abrir outra rota (por exemplo uma build em /docs/), altere SITE_URL para essa rota.</div>';
+      } else {
+        visitAnchor.classList.remove('hidden');
+        statusText.textContent = 'Clique em "Ir para o site agora" para abrir o site principal em nova aba.';
+      }
+    })();
 
     btnStay.addEventListener('click', () => {
-      countdownEl.textContent = 'Você escolheu ver o README.md abaixo.';
+      statusText.textContent = 'Mostrando README.md abaixo.';
       readmeContainer.scrollIntoView({ behavior: 'smooth' });
     });
 
@@ -65,17 +109,19 @@
         const res = await fetch(rawUrl);
         if (!res.ok) throw new Error('README não encontrado no branch configurado');
         const md = await res.text();
-             const pre = document.createElement('pre');
+        const pre = document.createElement('pre');
         pre.textContent = md;
         readmeContainer.innerHTML = '';
         readmeContainer.appendChild(pre);
 
         const note = document.createElement('div');
         note.className = 'small';
-        note.textContent = 'Dica: para renderizar Markdown como HTML, renomeie/coloque o conteúdo em index.md com front matter (Jekyll) ou publique a build do site em /docs.';
+        note.textContent = 'Dica: para renderizar Markdown como HTML, use index.md com front matter (Jekyll) ou publique a build do frontend na pasta /docs.';
         readmeContainer.appendChild(note);
+        statusText.textContent = 'README carregado.';
       } catch (err) {
         readmeContainer.innerHTML = `<p class="small">Falha ao carregar README.md: ${err.message}</p>`;
+        statusText.textContent = 'Erro ao carregar README.';
       }
     })();
   </script>
