@@ -1,12 +1,89 @@
 <!doctype html>
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-    <title>Legado Escolar - Prototype</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Legado Escolar — Entrando</title>
+  <style>
+    body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; margin: 0; padding: 24px; background:#f6f8fa; color:#111; }
+    .wrap { max-width: 980px; margin: 0 auto; }
+    .notice { background: #fff; border: 1px solid #e1e4e8; padding: 16px; border-radius:8px; box-shadow: 0 1px 2px rgba(0,0,0,.03); }
+    .actions { margin-top: 12px; display:flex; gap:12px; align-items:center; }
+    .btn { padding:10px 14px; border-radius:6px; border: none; cursor:pointer; font-weight:600; }
+    .btn-visit { background:#0366d6; color:#fff; }
+    .btn-cancel { background:#e6edf3; color:#04293a; }
+    pre { white-space: pre-wrap; word-break: break-word; font-size: 14px; line-height:1.5; background: #fbfdff; padding: 12px; border-radius:6px; border:1px solid #eef2f6; margin-top:12px; }
+    .small { color:#586069; font-size:13px; margin-top:8px; }
+  </style>
+  <meta http-equiv="refresh" content="3;url=SITE_URL_REPLACE" id="metaRedirect">
+</head>
+<body>
+  <div class="wrap">
+    <h1>Legado Escolar</h1>
+    <div class="notice">
+      <p>Você será redirecionado automaticamente para o site principal em <strong>3 segundos</strong>.</p>
+      <div class="actions">
+        <button class="btn btn-visit" id="btnVisit">Ir para o site agora</button>
+        <button class="btn btn-cancel" id="btnStay">Permanecer e ver o README</button>
+        <div class="small" id="countdown">Redirecionando em 3s…</div>
+      </div>
+
+      <div id="readmeContainer">
+        <p class="small">Carregando README.md…</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+
+    const SITE_URL = "https://cceleste6.github.io/prototipov3/";
+    const GITHUB_USER = "cceleste6";
+    const GITHUB_REPO = "prototipov3";
+    const BRANCH = "gh-pages";
+
+    document.getElementById('metaRedirect').setAttribute('content', `3;url=${SITE_URL}`);
+
+    let t = 3;
+    const cd = document.getElementById('countdown');
+    const timer = setInterval(() => {
+      t--;
+      if (t <= 0) {
+        clearInterval(timer);
+        cd.textContent = 'Redirecionando…';
+      } else {
+        cd.textContent = `Redirecionando em ${t}s…`;
+      }
+    }, 1000);
+
+    document.getElementById('btnVisit').addEventListener('click', () => {
+      window.location.href = SITE_URL;
+    });
+
+    document.getElementById('btnStay').addEventListener('click', () => {
+      document.getElementById('metaRedirect').setAttribute('content', `0;url=${window.location.href}`);
+      clearInterval(timer);
+      cd.textContent = 'Redirecionamento cancelado. Você está vendo o README.md abaixo.';
+    });
+
+    (async function loadReadme() {
+      const rawUrl = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/${BRANCH}/README.md`;
+      const container = document.getElementById('readmeContainer');
+      try {
+        const res = await fetch(rawUrl);
+        if (!res.ok) throw new Error('README não encontrado no branch configurado');
+        const md = await res.text();
+        const pre = document.createElement('pre');
+        pre.textContent = md;
+        container.innerHTML = '';
+        container.appendChild(pre);
+        const note = document.createElement('div');
+        note.className = 'small';
+        note.textContent = 'Se quiser que o README seja convertido em HTML automaticamente, copie seu conteúdo para index.md com front matter (Jekyll) ou publique a build do site na pasta docs.';
+        container.appendChild(note);
+      } catch (err) {
+        container.innerHTML = `<p class="small">Falha ao carregar README.md: ${err.message}</p>`;
+      }
+    })();
+  </script>
+</body>
 </html>
